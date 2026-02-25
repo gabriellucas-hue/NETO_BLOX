@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel Riddle Challenge</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    background: black;
+    color: #00ff00;
+    font-family: 'Press Start 2P', monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+}
+
+#countdown, #riddle, #blockedMessage, #finalScreen {
+    transition: all 0.1s;
+}
+
+#countdown {
+    font-size: 2em;
+    margin-bottom: 30px;
+    padding: 10px 20px;
+    border: 3px solid #00ff00;
+    background: black;
+}
+
+#riddle, #blockedMessage {
+    max-width: 600px;
+    background: black;
+    padding: 20px;
+    border: 3px solid #00ff00;
+    display: none;
+}
+
+#riddle p, #blockedMessage p {
+    font-size: 0.8em;
+    margin-bottom: 15px;
+}
+
+#answer, #extraMessage {
+    margin-top: 10px;
+    font-size: 0.8em;
+    font-weight: bold;
+    display: none;
+}
+
+#answer { color: #ff0000; }
+#extraMessage { color: #00ffff; margin-top: 5px; }
+
+#messageAttempts { margin-top: 10px; font-size: 0.7em; color: #ff0000; }
+
+input, button {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.7em;
+    border: 3px solid #00ff00;
+    background: black;
+    color: #00ff00;
+    padding: 5px;
+    margin-top: 10px;
+    transition: all 0.1s;
+}
+
+button { cursor: pointer; }
+button:hover { background: #00ff00; color: black; }
+
+#finalScreen {
+    display: none;
+    color: #ff0000;
+    font-size: 2em;
+    padding: 20px;
+    border: 3px solid #ff0000;
+    background: black;
+}
+</style>
+</head>
+<body>
+
+<div id="countdown">Loading...</div>
+
+<div id="riddle">
+    <p id="riddleText"><strong>HARD RIDDLE:</strong> I can be cracked, made, told, and played. What am I?</p>
+    <input type="text" id="userInput" placeholder="Enter your answer">
+    <br>
+    <button id="submitBtn" onclick="checkAnswer()">Submit</button>
+    <div id="messageAttempts">You have 3 attempts left.</div>
+    <div id="answer">Joke</div>
+    <div id="extraMessage">If you guess it, I will tell you who I like</div>
+</div>
+
+<div id="blockedMessage"><p>You will never know who I like</p></div>
+<div id="finalScreen">Gabriel te vigila</div>
+
+<script>
+let attempts = 3;
+const riddleEl = document.getElementById("riddle");
+const riddleTextEl = document.getElementById("riddleText");
+const answerEl = document.getElementById("answer");
+const extraMessageEl = document.getElementById("extraMessage");
+const blockedEl = document.getElementById("blockedMessage");
+const inputEl = document.getElementById("userInput");
+const buttonEl = document.getElementById("submitBtn");
+const countdownEl = document.getElementById("countdown");
+const finalScreenEl = document.getElementById("finalScreen");
+
+riddleEl.style.display = "block";
+
+function endGame() {
+    riddleEl.style.display = "none";
+    blockedEl.style.display = "none";
+    countdownEl.style.display = "none";
+    finalScreenEl.style.display = "block";
+}
+
+function checkAnswer() {
+    const input = inputEl.value.trim().toLowerCase();
+    const message = document.getElementById("messageAttempts");
+
+    if(input === "joke") {
+        answerEl.style.display = "block";
+        extraMessageEl.style.display = "block";
+        message.textContent = "Correct!";
+        inputEl.disabled = true;
+        buttonEl.disabled = true;
+        setTimeout(endGame, 2000);
+    } else {
+        attempts--;
+        if(attempts > 0) {
+            message.textContent = `you are dumb! ${attempts} attempt(s) left.`;
+        } else {
+            blockedEl.style.display = "block";
+            setTimeout(endGame, 2000);
+        }
+    }
+}
+
+// Countdown timer
+const targetDate = new Date("March 9, 2026 00:00:00").getTime();
+setInterval(() => {
+    const now = new Date().getTime();
+    const distance = targetDate - now;
+    const days = Math.floor(distance / (1000*60*60*24));
+    const hours = Math.floor((distance % (1000*60*60*24)) / (1000*60*60));
+    const minutes = Math.floor((distance % (1000*60*60)) / (1000*60));
+    const seconds = Math.floor((distance % (1000*60)) / 1000);
+
+    if(distance > 0){
+        countdownEl.innerText = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    } else {
+        countdownEl.innerText = "The doors are open, enjoy the journey";
+    }
+},1000);
+
+// Pixel flicker + glitch (except riddle text)
+const glitchChars = ['@','#','$','%','&','?','!','>','<','*'];
+setInterval(()=>{
+    const colorsGreen = ["#00ff00","#00cc00","#009900","#00ff00"];
+    const colorsRed = ["#ff0000","#cc0000","#ff3333","#ff0000"];
+    const colorsCyan = ["#00ffff","#00cccc","#00ffff","#00aaaa"];
+
+    riddleEl.style.borderColor = colorsGreen[Math.floor(Math.random()*colorsGreen.length)];
+    inputEl.style.borderColor = colorsGreen[Math.floor(Math.random()*colorsGreen.length)];
+    buttonEl.style.borderColor = colorsGreen[Math.floor(Math.random()*colorsGreen.length)];
+    countdownEl.style.borderColor = colorsGreen[Math.floor(Math.random()*colorsGreen.length)];
+    answerEl.style.color = colorsRed[Math.floor(Math.random()*colorsRed.length)];
+    extraMessageEl.style.color = colorsCyan[Math.floor(Math.random()*colorsCyan.length)];
+
+    // Glitch countdown only
+    const cdText = countdownEl.innerText;
+    let glitchCd = '';
+    for(let i=0;i<cdText.length;i++){
+        glitchCd += (Math.random()<0.05 && cdText[i]!==" ") ? glitchChars[Math.floor(Math.random()*glitchChars.length)] : cdText[i];
+    }
+    countdownEl.innerText = glitchCd;
+},500);
+</script>
+
+</body>
+</html>
